@@ -20,7 +20,7 @@
   <depend>rclcpp</depend>
   <depend>rclcpp_lifecycle</depend>
   <depend>geometry_msgs</depend>
-  <depend>ros2_control_explorer</depend>
+  <depend>explorer_description</depend>
   <depend>ros2_control_wheelchair</depend>
 
   <exec_depend>diff_drive_controller</exec_depend>
