@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="simulation">
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="wheelchair_robot_simulation">
 
   <xacro:include filename="$(find ros2_control_wheelchair)/description/material/wheelchair.materials.xacro" />
 
@@ -7,9 +7,31 @@
  
   <xacro:wheelchair/>
 
-  <xacro:include filename="$(find ros2_control_explorer)/description/urdf/explorer_POC1_description.urdf.xacro" />
+  <xacro:unless value="$(arg use_POC2)">
+    <!-- Import explorer macro -->
+    <xacro:include filename="$(find explorer_description)/urdf/explorer_POC1_description.urdf.xacro"/>
+    <joint name="joint_6" type="revolute">
+      <parent link="link_5"/>
+      <child link="structure"/>
+      <origin xyz="0 0.090 0.083" rpy="0 ${(65*pi)/180} ${pi/2}"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1000.0" lower="${-pi}" upper="${pi}" velocity="10"/>
+    </joint>
+    <xacro:explorer_POC1_description/>
+  </xacro:unless>
+  <xacro:if value="$(arg use_POC2)">
+    <!-- Import explorer macro -->
+    <xacro:include filename="$(find explorer_description)/urdf/explorer_POC2_description.urdf.xacro"/>
 
-  <xacro:explorer_old_description/>
+    <joint name="joint_6" type="revolute">
+      <parent link="link_5"/>
+      <child link="structure"/>
+      <origin xyz="0 0.1555 -0.027" rpy="${pi/2} ${pi} ${pi}"/>
+      <axis xyz="0 0 1"/>
+      <limit effort="1000.0" lower="-2.97" upper="2.97" velocity="10"/>
+    </joint>
+    <xacro:explorer_POC2_description/>
+  </xacro:if>
 
   <xacro:include filename="$(find gripper_pincette)/description/urdf/gripper_pincette_description.urdf.xacro"/>
   
@@ -49,14 +71,6 @@
     <origin xyz="0.0 -0.075 0.0" rpy="0 0 0"/>
     <parent link="fixation"/>
     <child link="base_link"/>
-  </joint>
-
-  <joint name="joint_6" type="revolute">
-    <parent link="link_5"/>
-    <child link="structure"/>
-    <origin xyz="0 0.090 0.083" rpy="0 ${(65*pi)/180} ${pi/2}"/>
-    <axis xyz="0 0 1"/>
-    <limit effort="1000.0" lower="${-pi}" upper="${pi}" velocity="2.5"/>
   </joint>
 
   <joint name="joint-ft_frame" type="fixed">
