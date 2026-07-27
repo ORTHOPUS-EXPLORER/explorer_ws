@@ -1,0 +1,10 @@
+{
+    "names": {
+        "qontrol_controller": {
+            "cmake-args": [
+                "-D CMAKE_CXX_FLAGS=-w",
+                "-D CMAKE_C_FLAGS=-w"
+            ]
+        }
+    }
+}
