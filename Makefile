@@ -4,7 +4,7 @@ init:
 install:
 	apt update
 	$(MAKE) install -C qontrol_controller
-	rosdep install --from-paths . --ignore-src
+	rosdep install --from-paths . --ignore-src -y
 
 .PHONY: install clean
 clean:
