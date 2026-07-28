@@ -219,7 +219,7 @@ def generate_launch_description():
             ),
         ),
         robot_simulation,
-        # spacenav_node_group,
+        spacenav_node_group,
         joy_node,
         gui_control_node,
         image_bridge,
