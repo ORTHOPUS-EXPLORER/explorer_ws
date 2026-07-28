@@ -1,0 +1,77 @@
+import os
+import unittest
+
+import launch
+import launch.actions
+import launch.events
+import launch_testing
+import launch_testing.asserts
+import pytest
+from ament_index_python.packages import get_package_share_directory
+from launch.actions import IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+
+
+@pytest.mark.launch_test
+def generate_test_description():
+    # 1. Locate your launch file
+    pkg_share = get_package_share_directory('explorer_on_wheelchair')
+    launch_file_path = os.path.join(pkg_share, 'launch', 'simulation.launch.py')
+
+    # 2. Include the launch file (you can pass launch arguments here)
+    launch_inclusion = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(launch_file_path),
+        launch_arguments={'can_port': 'vcan0', 'gui': 'false'}.items()
+    )
+
+    # Create a timer to kill the test after 7.5 seconds. 
+    # This gives nodes enough time to boot up, configure, and prove they don't crash.
+    shutdown_timer = launch.actions.TimerAction(
+        period=7.5,
+        actions=[
+            launch_testing.actions.ReadyToTest()
+        ]
+    )
+
+    return launch.LaunchDescription([
+        launch.actions.SetLaunchConfiguration(
+            name='sigterm_timeout', value='1.0'
+        ),
+        launch.actions.SetLaunchConfiguration(
+            name='sigkill_timeout', value='3.0'
+        ),
+        launch_inclusion,
+        shutdown_timer
+        
+    ])
+
+# -----------------------------------------------------------------------------
+# Tests that run AFTER the launch file is shut down
+# -----------------------------------------------------------------------------
+@launch_testing.post_shutdown_test()
+class TestProcessOutput(unittest.TestCase):
+
+    def test_no_crashes(self, proc_info, proc_output):
+        """Check that all processes exited normally (no crashes)."""
+
+        # assertExitCodes checks that every node managed by the launch file 
+        # exited with a clean code (0) and did not segfault or throw an unhandled exception.
+        launch_testing.asserts.assertExitCodes(proc_info, process="wheelchair_controller")
+        launch_testing.asserts.assertExitCodes(proc_info, process="head_controller")
+        
+        ## Cannot be tested as long as the while loop in constructor exists
+        # launch_testing.asserts.assertExitCodes(proc_info, process="input_integrator")
+        # launch_testing.asserts.assertExitCodes(proc_info, process="output_integrator")
+        
+        launch_testing.asserts.assertExitCodes(proc_info, process="qp_solving")
+        launch_testing.asserts.assertExitCodes(proc_info, process="robot_state_publisher")
+        launch_testing.asserts.assertExitCodes(proc_info, process="spawner", cmd_args=["joint_state_broadcaster"])
+        launch_testing.asserts.assertExitCodes(proc_info, process="spawner", cmd_args=["diff_drive_base_controller"])
+        launch_testing.asserts.assertExitCodes(proc_info, process="spawner", cmd_args=["head_position_controller"])
+        launch_testing.asserts.assertExitCodes(proc_info, process="spawner", cmd_args=["forward_position_controller"])
+        launch_testing.asserts.assertExitCodes(proc_info, process="spawner", cmd_args=["gripper_controller"])
+        launch_testing.asserts.assertExitCodes(proc_info, process="spacenav_node")
+        launch_testing.asserts.assertExitCodes(proc_info, process="joy_node")
+        ## Never quit properly: would be better to check stdout
+        # launch_testing.asserts.assertExitCodes(proc_info, process="gazebo")
+        launch_testing.asserts.assertExitCodes(proc_info, process="image_bridge")
