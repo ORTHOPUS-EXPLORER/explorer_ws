@@ -29,7 +29,7 @@
     "workspaceFolder": "/root/explorer_ws",
     "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
     // Try to pull all private repositories
-    "initializeCommand": "make init",
+    "initializeCommand": "if [ -n \"${localEnv:XAUTHORITY}\" ] && [ -f \"${localEnv:XAUTHORITY}\" ]; then cp \"${localEnv:XAUTHORITY}\" ${localWorkspaceFolder}/.devcontainer/.xauthority; elif [ -f \"$HOME/.Xauthority\" ]; then cp \"$HOME/.Xauthority\" ${localWorkspaceFolder}/.devcontainer/.xauthority; else touch ${localWorkspaceFolder}/.devcontainer/.xauthority; fi && chmod 600 ${localWorkspaceFolder}/.devcontainer/.xauthority && make init",
     "postCreateCommand": "git config --global --add safe.directory '*' && rm ${containerWorkspaceFolder}/*/.*_installed && make install && /bin/bash -ci '${containerWorkspaceFolder}/explorer_stack/.devcontainer/build.sh'",
     "postStartCommand": "set_device_permissions.sh",
     "remoteEnv": {
@@ -44,7 +44,7 @@
             "type": "bind"
         },
         {
-            "source": "${localEnv:XAUTHORITY}",
+            "source": "${localWorkspaceFolder}/.devcontainer/.xauthority",
             "target": "/root/.Xauthority",
             "type": "bind"
         },

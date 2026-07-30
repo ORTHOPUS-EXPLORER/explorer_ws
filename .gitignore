@@ -261,3 +261,5 @@ AMENT_IGNORE
 
 .*_installed
 qontrol_controller/qontrol_controller
+.devcontainer/.env
+.devcontainer/.xauthority
