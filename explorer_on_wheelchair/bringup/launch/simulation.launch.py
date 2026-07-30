@@ -17,7 +17,39 @@ import os
 from ament_index_python.packages import (
     get_package_share_directory,
 )
-from explorer_bringup.launch.optional_parameters import declare_parameter_spacenav
+from explorer_bringup.launch.controller_manager_spawner import (
+    declare_node_forward_position_controller_spawner,
+    declare_node_gripper_controller_spawner,
+)
+from explorer_bringup.launch.hardware_parameters import (
+    declare_hardware_argument_list,
+)
+from explorer_bringup.launch.optional import (
+    declare_joy_node,
+    declare_spacenav_node_group,
+)
+from explorer_bringup.launch.optional_parameters import (
+    declare_parameter_input_device,
+    declare_parameter_spacenav,
+)
+from explorer_bringup.launch.shared import (
+    declare_input_integrator_node,
+    declare_output_integrator_node,
+)
+from explorer_bringup.launch.shared_parameters import (
+    CONTROLLER_CONFIG_TYPE,
+    get_parameter_can_port,
+    get_parameter_gui,
+    get_parameter_host_id,
+    get_parameter_simulation,
+    get_parameter_use_poc2,
+)
+from explorer_bringup.launch.simulation import (
+    declare_simulation_node_group,
+)
+from explorer_bringup.launch.simulation_parameters import (
+    declare_simulation_argument_list,
+)
 from launch import LaunchDescription
 from launch.actions import SetLaunchConfiguration
 from launch.conditions import IfCondition
@@ -28,39 +60,6 @@ from launch.substitutions import (
 )
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
-
-from build.explorer_bringup.ament_cmake_python.explorer_bringup.explorer_bringup.launch.optional_parameters import (
-    declare_parameter_input_device,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.controller_manager_spawner import (
-    declare_node_forward_position_controller_spawner,
-    declare_node_gripper_controller_spawner,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.hardware_parameters import (
-    declare_hardware_argument_list,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.optional import (
-    declare_joy_node,
-    declare_spacenav_node_group,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.shared import (
-    declare_input_integrator_node,
-    declare_output_integrator_node,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.shared_parameters import (
-    CONTROLLER_CONFIG_TYPE,
-    get_parameter_can_port,
-    get_parameter_gui,
-    get_parameter_host_id,
-    get_parameter_simulation,
-    get_parameter_use_poc2,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.simulation import (
-    declare_simulation_node_group,
-)
-from explorer_stack.explorer_bringup.explorer_bringup.launch.simulation_parameters import (
-    declare_simulation_argument_list,
-)
 
 
 def _declare_arguments(robot_controller_config: CONTROLLER_CONFIG_TYPE):
