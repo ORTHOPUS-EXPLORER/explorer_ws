@@ -4,7 +4,7 @@ project(explorer_ws_tests)
 find_package(ament_cmake REQUIRED)
 
 if(BUILD_TESTING)
-    find_package(ament_cmake_ros REQUIRED)
+  find_package(ament_cmake_ros REQUIRED)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_cmake_pytest REQUIRED)
   find_package(launch_testing_ament_cmake REQUIRED)
@@ -24,7 +24,8 @@ if(BUILD_TESTING)
 
   ## LAUNCH & E2E TESTS
   add_ros_isolated_launch_test(test/launch/test_explorer_on_wheelchair.py)
-  add_ros_isolated_launch_test(test/launch/test_explorer_with_qontrol_controller.py)
+  add_ros_isolated_launch_test(test/launch/test_explorer_mode_0_with_qontrol_controller.py)
+  add_ros_isolated_launch_test(test/launch/test_explorer_cartesian_control_with_qontrol_controller.py)
   
 endif()
 

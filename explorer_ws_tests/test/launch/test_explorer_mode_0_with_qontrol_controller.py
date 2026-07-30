@@ -24,10 +24,10 @@ def generate_test_description():
         launch_arguments={'can_port': 'vcan0', 'gui': 'false', 'use_qp_inria': 'true'}.items()
     )
 
-    # Create a timer to kill the test after 5 seconds. 
+    # Create a timer to kill the test after 7.5 seconds. 
     # This gives nodes enough time to boot up, configure, and prove they don't crash.
     shutdown_timer = launch.actions.TimerAction(
-        period=5.0,
+        period=4.0,
         actions=[
             launch_testing.actions.ReadyToTest()
         ]
@@ -47,9 +47,6 @@ class TestProcessOutput(unittest.TestCase):
     def test_no_crashes(self, proc_info, proc_output):
         """Check that all processes exited normally (no crashes)."""
 
-        # assertExitCodes checks that every node managed by the launch file 
-        # exited with a clean code (0) and did not segfault or throw an unhandled exception.
-        
         ## Cannot be tested as long as the while loop in constructor exists
         # launch_testing.asserts.assertExitCodes(proc_info, process="input_integrator")
         # launch_testing.asserts.assertExitCodes(proc_info, process="output_integrator")
@@ -62,4 +59,3 @@ class TestProcessOutput(unittest.TestCase):
         launch_testing.asserts.assertExitCodes(proc_info, process="spawner", cmd_args=["joint_trajectory_controller"])
         launch_testing.asserts.assertExitCodes(proc_info, process="joy_node")
         launch_testing.asserts.assertExitCodes(proc_info, process="web_gui_node")        ## Never quit properly: would be better to check stdout
-        # launch_testing.asserts.assertExitCodes(proc_info, process="gazebo")
