@@ -9,11 +9,18 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <exec_depend>explorer_on_wheelchair</exec_depend>
-  <exec_depend>explorer_stack</exec_depend>
-  <exec_depend>qontrol_controller</exec_depend>
-
+  <test_depend>explorer_on_wheelchair</test_depend>
+  <test_depend>explorer_bringup</test_depend>
+  <test_depend>explorer_user_interfaces_cpp</test_depend>
+  <test_depend>qontrol_controller</test_depend>
+  <test_depend>gripper_pincette</test_depend>
+  <test_depend>explorer_input_devices</test_depend>
+  <test_depend>explorer_user_interfaces_web</test_depend>
+  <test_depend>explorer_controllers</test_depend>
   <test_depend>ament_cmake_pytest</test_depend>
+  <test_depend>ament_index_python</test_depend>
+  <test_depend>launch</test_depend>
+  <test_depend>launch_ros</test_depend>
   <test_depend>launch_testing_ament_cmake</test_depend>
   <test_depend>launch_testing_ros</test_depend>
 

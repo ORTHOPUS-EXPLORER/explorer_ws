@@ -30,10 +30,10 @@ def generate_test_description():
         }.items(),
     )
 
-    # Create a timer to kill the test after 7.5 seconds.
+    # Create a timer to kill the test after 10 seconds.
     # This gives nodes enough time to boot up, configure, and prove they don't crash.
     shutdown_timer = launch.actions.TimerAction(
-        period=7.5, actions=[launch_testing.actions.ReadyToTest()]
+        period=10.0, actions=[launch_testing.actions.ReadyToTest()]
     )
 
     return launch.LaunchDescription(
