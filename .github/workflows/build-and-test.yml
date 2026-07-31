@@ -1,0 +1,130 @@
+name: Build ROS2 package and c++ lint check
+on:
+  pull_request: {}
+  # Allow manual trigger
+  workflow_dispatch: {}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  pull-private-repositories:
+    uses: ./.github/workflows/workflow-pull-private-repositories.yml
+    secrets: inherit
+
+  build:
+    runs-on: ubuntu-latest
+    container:
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+      image: ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest
+    needs: pull-private-repositories
+    permissions:
+      packages: read
+    steps:
+      # Pull private repositories files
+      - name: Download private repositories files
+        uses: actions/download-artifact@v7
+        with:
+          name: pull-private-repositories-explorer-ws
+
+      # Only exec when testing locally with Act (https://github.com/nektos/act/issues/973)
+      - name: Act Workaround
+        if: ${{ env.ACT }}
+        run: curl -fsSL https://deb.nodesource.com/setup_22.x | bash && apt install -y nodejs
+
+      - name: Cache colcon build directories
+        uses: actions/cache@v6
+        with:
+          # Couldn't cache build/install folder: it keeps building cxx files everytimes so I tried to relied on ccache and it's better than nothing
+          path: |
+            .ccache
+            install
+          key: colcon-${{ hashFiles('src/**/CMakeLists.txt', 'src/**/package.xml') }}-${{ github.base_ref }}
+          restore-keys: |
+            colcon-${{ hashFiles('src/**/CMakeLists.txt', 'src/**/package.xml') }}-
+            colcon-
+
+      - name: Build ROS packages with test
+        run: |
+          source /opt/ros/iron/setup.bash
+          ## ---- Pinocchio start ----
+          PATH=/opt/openrobots/bin:$PATH
+          PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH
+          LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
+          PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH
+          CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH
+          ## ---- Pinocchio end ----
+          CCACHE_COMPILERCHECK=content CCACHE_BASEDIR=$PWD CCACHE_DIR=$PWD/.ccache COLCON_HOME=/root/.colcon COLCON_MIXIN_PATH=/root/.colcon/mixins colcon build --continue-on-error --mixin ccache build-testing-on --event-handlers console_direct+
+
+      - name: Upload build/install Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ros2-build-explorer-ws
+          path: |
+            build/
+            install/
+          retention-days: 2
+
+  launch_test:
+    runs-on: ubuntu-latest
+    # container:
+    #   credentials:
+    #     username: ${{ github.actor }}
+    #     password: ${{ secrets.GITHUB_TOKEN }}
+    #   image: ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest
+    needs: build
+    steps:
+      - name: Download build folder from build job
+        uses: actions/download-artifact@v7
+        with:
+          name: ros2-build-explorer-ws
+      
+      - name: Setup Virtual CAN (vcan0)
+        run: |
+          # Install needed vcan modprobe
+          sudo apt update -y
+          sudo apt-get install -y linux-modules-extra-$(uname -r)
+
+          # Load the virtual CAN kernel module
+          sudo modprobe vcan
+          
+          # Create the virtual CAN interface
+          sudo ip link add dev vcan0 type vcan
+          
+          # Set the MTU (16 for standard CAN) and bring it up
+          sudo ip link set mtu 16 up dev vcan0
+          
+          # Verify the interface is up and configured correctly
+          ip -details link show vcan0
+
+      # - name: Launch tests
+      #   run: |
+      #     source /opt/ros/iron/setup.bash
+      #     ## ---- Pinocchio start ----
+      #     PATH=/opt/openrobots/bin:$PATH
+      #     PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH
+      #     LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
+      #     PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH
+      #     CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH
+      #     ## ---- Pinocchio end ----
+      #     colcon test --packages-select explorer_ws_tests
+
+      - name: Pull ROS container
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io --username ${{ github.actor }} --password-stdin
+          docker pull ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest  
+
+      - name: Run tests
+        run: |
+          docker run --rm --network host --privileged -v ${{ github.workspace }}:/root/explorer_ws -w /root/explorer_ws \
+            ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest \
+            /bin/bash -c "source /opt/ros/iron/setup.bash && source install/setup.bash && \
+            PATH=/opt/openrobots/bin:$PATH && \
+            PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH && \
+            LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH && \
+            PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH && \
+            CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH && \
+            colcon test --packages-select explorer_ws_tests"

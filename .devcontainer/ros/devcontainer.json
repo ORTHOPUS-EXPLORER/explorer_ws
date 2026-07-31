@@ -1,10 +1,10 @@
 {
     "name": "Orthopus explorer stack (ROS2 - Iron)",
     "build": {
-        "context": "../../explorer_stack",
-        "dockerfile": "../../explorer_stack/Dockerfile",
-        "target": "explorer_dev",
-        "cacheFrom": "ghcr.io/orthopus-explorer/ros-iron-explorer/dev:latest",
+        "context": "../..",
+        "dockerfile": "../../Dockerfile",
+        "target": "explorer_ws_dev",
+        "cacheFrom": "ghcr.io/orthopus-explorer/ros-iron-explorer-ws/dev:latest",
         "args": {
             "ROS_DISTRO": "iron"
         }
@@ -30,7 +30,7 @@
     "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
     // Try to pull all private repositories
     "initializeCommand": "if [ -n \"${localEnv:XAUTHORITY}\" ] && [ -f \"${localEnv:XAUTHORITY}\" ]; then cp \"${localEnv:XAUTHORITY}\" ${localWorkspaceFolder}/.devcontainer/.xauthority; elif [ -f \"$HOME/.Xauthority\" ]; then cp \"$HOME/.Xauthority\" ${localWorkspaceFolder}/.devcontainer/.xauthority; else touch ${localWorkspaceFolder}/.devcontainer/.xauthority; fi && chmod 600 ${localWorkspaceFolder}/.devcontainer/.xauthority && make init",
-    "postCreateCommand": "git config --global --add safe.directory '*' && rm ${containerWorkspaceFolder}/*/.*_installed && make install && /bin/bash -ci '${containerWorkspaceFolder}/explorer_stack/.devcontainer/build.sh'",
+    "postCreateCommand": "git config --global --add safe.directory '*' && /bin/bash -ci '${containerWorkspaceFolder}/explorer_stack/.devcontainer/build.sh'",
     "postStartCommand": "set_device_permissions.sh",
     "remoteEnv": {
         "DISPLAY": "${localEnv:DISPLAY}", // X11 forwarding
@@ -38,6 +38,11 @@
         "SSH_AUTH_SOCK": "/ssh-agent"
     },
     "mounts": [
+        {
+            "source": "/run/udev",
+            "target": "/run/udev",
+            "type": "bind"
+        },
         {
             "source": "${localEnv:SSH_AUTH_SOCK}",
             "target": "/ssh-agent",
