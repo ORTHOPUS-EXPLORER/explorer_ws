@@ -24,10 +24,10 @@ def generate_test_description():
         launch_arguments={'can_port': 'vcan0', 'gui': 'false', 'use_qp_inria': 'true', 'spacenav': 'false'}.items()
     )
 
-    # Create a timer to kill the test after 4 seconds. 
+    # Create a timer to kill the test after 7.5 seconds. 
     # This gives nodes enough time to boot up, configure, and prove they don't crash.
     shutdown_timer = launch.actions.TimerAction(
-        period=4.0,
+        period=7.5,
         actions=[
             launch_testing.actions.ReadyToTest()
         ]

@@ -1,0 +1,26 @@
+name: "Workflow: pull private repositories"
+on:
+    workflow_call:
+
+jobs:
+    pull-private-repositories:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout PR
+              uses: actions/checkout@v7
+              with:
+                submodules: recursive
+
+            - name: Pull private repositories
+              run: make init REPOSITORY_USE_SSH=0 INRIA_REPOSITORY_HTTPS_USERNAME=${{ secrets.INRIA_USERNAME }} INRIA_REPOSITORY_HTTPS_TOKEN=${{ secrets.INRIA_TOKEN }}
+
+            - name: Archive production artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                name: pull-private-repositories-explorer-ws
+                path: |
+                  .
+                  !.cache # When local testing
+                  !build # When local testing
+                  !install # When local testing
+                  !log # When local testing
