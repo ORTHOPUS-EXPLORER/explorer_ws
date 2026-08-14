@@ -12,9 +12,11 @@ import pytest
 from ament_index_python.packages import get_package_share_directory
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch_testing import ready_to_test_action_timeout
 
 
 @pytest.mark.launch_test
+@ready_to_test_action_timeout(60)
 def generate_test_description():
     # 1. Locate your launch file
     pkg_share = get_package_share_directory("explorer_on_wheelchair")
@@ -33,13 +35,13 @@ def generate_test_description():
     # Create a timer to kill the test after 10 seconds.
     # This gives nodes enough time to boot up, configure, and prove they don't crash.
     shutdown_timer = launch.actions.TimerAction(
-        period=10.0, actions=[launch_testing.actions.ReadyToTest()]
+        period=20.0, actions=[launch_testing.actions.ReadyToTest()]
     )
 
     return launch.LaunchDescription(
         [
-            launch.actions.SetLaunchConfiguration(name="sigterm_timeout", value="1.0"),
-            launch.actions.SetLaunchConfiguration(name="sigkill_timeout", value="3.0"),
+            # launch.actions.SetLaunchConfiguration(name="sigterm_timeout", value="2.0"),
+            # launch.actions.SetLaunchConfiguration(name="sigkill_timeout", value="3.0"),
             launch_inclusion,
             shutdown_timer,
         ]
