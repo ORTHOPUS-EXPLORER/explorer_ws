@@ -66,7 +66,8 @@ $(PINOCCHIO_STAMP_FILE): $(PINOCCHIO_LIST_FILE)
 	apt update && apt install -qy robotpkg-py3*-pinocchio
 	@touch $@
 
-install_pinocchio: $(PINOCCHIO_STAMP_FILE)
+install_pinocchio:
+	apt update && apt install -qy ros-${ROS_DISTRO}-pinocchio
 
 install: install_pinocchio
 

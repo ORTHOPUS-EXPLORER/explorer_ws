@@ -19,7 +19,7 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-      image: ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest
+      image: ghcr.io/orthopus-explorer/explorer_ws/builder:jazzy-latest
     needs: pull-private-repositories
     permissions:
       packages: read
@@ -52,13 +52,6 @@ jobs:
           mkdir -p /root/explorer_ws
           cd /root/explorer_ws
           source /opt/ros/${ROS_DISTRO}/setup.bash
-          ## ---- Pinocchio start ----
-          PATH=/opt/openrobots/bin:$PATH
-          PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH
-          LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH
-          PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH
-          CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH
-          ## ---- Pinocchio end ----
           CCACHE_DIR=/root/.ccache COLCON_HOME=/root/.colcon COLCON_MIXIN_PATH=/root/.colcon/mixins colcon build --symlink-install --continue-on-error --mixin ccache build-testing-on --event-handlers console_direct+
 
       - name: Archive ROS2
@@ -105,20 +98,17 @@ jobs:
       - name: Pull ROS container
         run: |
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io --username ${{ github.actor }} --password-stdin
-          docker pull ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest  
+          docker pull ghcr.io/orthopus-explorer/explorer_ws/builder:jazzy-latest
 
       - name: Run tests
         run: |
           docker run --rm --entrypoint "" --network host --privileged -v ${{ github.workspace }}:/root/explorer_ws -w /root/explorer_ws \
-            ghcr.io/orthopus-explorer/ros-iron-explorer-ws/builder:latest \
-            /bin/bash -c 'PATH=/opt/openrobots/bin:$PATH;
-            PKG_CONFIG_PATH=/opt/openrobots/lib/pkgconfig:$PKG_CONFIG_PATH;
-            LD_LIBRARY_PATH=/opt/openrobots/lib:$LD_LIBRARY_PATH;
-            PYTHONPATH=/opt/openrobots/lib/python3.10/site-packages:$PYTHONPATH;
-            CMAKE_PREFIX_PATH=/opt/openrobots:$CMAKE_PREFIX_PATH;
+            ghcr.io/orthopus-explorer/explorer_ws/builder:jazzy-latest \
+            /bin/bash -c 'set -e;
             source /opt/ros/${ROS_DISTRO}/setup.bash;
             source install/setup.bash;
-            colcon test --packages-select explorer_ws_tests'
+            colcon test --packages-select explorer_ws_tests;
+            colcon test-result --all'
 
       - name: Upload test result Artifact
         uses: actions/upload-artifact@v6

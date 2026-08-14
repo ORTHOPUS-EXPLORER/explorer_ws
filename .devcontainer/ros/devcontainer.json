@@ -1,12 +1,12 @@
 {
-    "name": "Orthopus explorer stack (ROS2 - Iron)",
+    "name": "Orthopus explorer stack (ROS2 - Jazzy)",
     "build": {
         "context": "../..",
         "dockerfile": "../../Dockerfile",
         "target": "explorer_ws_dev",
-        "cacheFrom": "ghcr.io/orthopus-explorer/ros-iron-explorer-ws/dev:latest",
+        "cacheFrom": "ghcr.io/orthopus-explorer/explorer_ws/dev:jazzy-latest",
         "args": {
-            "ROS_DISTRO": "iron"
+            "ROS_DISTRO": "jazzy"
         }
     },
     "capAdd": ["SYS_NICE", "SYS_PTRACE"],
