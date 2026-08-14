@@ -2,7 +2,7 @@
 ## May be reunited properly later
 
 # Overridable ROS distro argument (generic)
-ARG ROS_DISTRO=iron
+ARG ROS_DISTRO=jazzy
 ## Only used for production-ready image
 ARG ROS_USER=orthopus
 ARG ROS_WS=/home/${ROS_USER}/src/
@@ -66,9 +66,9 @@ RUN make install -C /tmp && rm /tmp/Makefile
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash && source install/setup.bash || true' >> ~/.bashrc
 
 ##  ---------------- Runner part (dev)---------------- 
-FROM ghcr.io/orthopus-explorer/ros-iron-explorer/dev AS explorer_ws_dev
+FROM ghcr.io/orthopus-explorer/ros-${ROS_DISTRO}-explorer/dev AS explorer_ws_dev
 LABEL org.opencontainers.image.source="https://github.com/ORTHOPUS-EXPLORER/explorer_ws"
-LABEL org.opencontainers.image.description="Development image for Orthopus Explorer workspacez"
+LABEL org.opencontainers.image.description="Development image for Orthopus Explorer workspace"
 # LABEL org.opencontainers.image.licenses=
 
 # Needed for build script
