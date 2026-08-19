@@ -91,6 +91,10 @@ RUN make install -C /tmp && rm /tmp/Makefile
 
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash && source install/setup.bash || true' >> ~/.bashrc
 
+# Make the workspace build script available globally as `ros_build`
+COPY .devcontainer/ros/build.sh /usr/local/bin/ros_build
+RUN chmod +x /usr/local/bin/ros_build
+
 ## ---------------- Runner part (prod) ----------------
 FROM explorer_ws_dev AS explorer_ws_prod
 LABEL org.opencontainers.image.description="Ready to uses image for Orthopus Explorer project"
