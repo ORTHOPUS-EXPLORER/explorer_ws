@@ -109,12 +109,10 @@ WORKDIR ${ROS_WS}
 # Setup passwordless sudoers for apt related commands
 RUN echo "${ROS_USER} ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/apt-get, /usr/bin/aptitude, /usr/bin/apt-fast, /usr/bin/add-apt-repository, /usr/local/bin/set_device_permissions.sh" >> /etc/sudoers
 
-COPY --chmod=0666 --chown=orthopus --exclude=build --exclude=install --exclude=log . ${ROS_WS}
+COPY --chown=orthopus --exclude=build --exclude=install --exclude=log . ${ROS_WS}
+RUN chmod -R a+rwX ${ROS_WS}
 
-# Add pinocchio export vars
-RUN INSTALL_USER=${ROS_USER} make -C qontrol_controller pinocchio_env_var
-
-RUN . /opt/ros/$ROS_DISTRO/setup.sh && . /home/${ROS_USER}/.bashrc \
+RUN . /opt/ros/$ROS_DISTRO/setup.sh && . /home/${ROS_USER}/.bashrc && cd ${ROS_WS} && \
     colcon build --symlink-install --continue-on-error --mixin release
 
 USER ${ROS_USER}
