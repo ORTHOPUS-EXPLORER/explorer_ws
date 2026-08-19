@@ -4,3 +4,15 @@
 [submodule "wheelchair_stack"]
 	path = wheelchair_stack
 	url = ../wheelchair_stack.git
+[submodule "input_interfaces"]
+	path = input_interfaces
+	url = ../isir-input_interfaces.git
+[submodule "tools"]
+	path = tools
+	url = ../isir-tools.git
+[submodule "sandbox_controller"]
+	path = sandbox_controller
+	url = ../isir-sandbox_controller.git
+[submodule "robot_interfaces"]
+	path = robot_interfaces
+	url = ../isir-robot_interfaces.git
