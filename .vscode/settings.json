@@ -33,5 +33,9 @@
     "/opt/ros/iron/lib/python3.10/site-packages",
     "install/lib/python3.10/site-packages/",
   ],
-  "git.blame.editorDecoration.enabled": true
+  "git.blame.editorDecoration.enabled": true,
+  "git.ignoredRepositories": [
+    "build/*",
+    "dist/*"
+  ]
 }
