@@ -32,7 +32,7 @@ def generate_test_description():
         }.items(),
     )
 
-    # Create a timer to kill the test after 10 seconds.
+    # Create a timer to kill the test after 20 seconds.
     # This gives nodes enough time to boot up, configure, and prove they don't crash.
     shutdown_timer = launch.actions.TimerAction(
         period=20.0, actions=[launch_testing.actions.ReadyToTest()]
@@ -59,10 +59,6 @@ class TestProcessOutput(unittest.TestCase):
             proc_info, process="wheelchair_controller"
         )
         launch_testing.asserts.assertExitCodes(proc_info, process="head_controller")
-
-        ## Cannot be tested as long as the while loop in constructor exists
-        # launch_testing.asserts.assertExitCodes(proc_info, process="input_integrator")
-        # launch_testing.asserts.assertExitCodes(proc_info, process="output_integrator")
 
         launch_testing.asserts.assertExitCodes(proc_info, process="qp_solving")
         launch_testing.asserts.assertExitCodes(
