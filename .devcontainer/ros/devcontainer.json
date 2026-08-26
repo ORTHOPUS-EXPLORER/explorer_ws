@@ -65,7 +65,7 @@
         }
     ],
     "features": {
-        "ghcr.io/devcontainers/features/github-cli:1": {}
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}
     },
     "customizations": {
         "vscode": {
@@ -78,7 +78,8 @@
                 "ms-vscode.cmake-tools",
                 "charliermarsh.ruff",
                 "njpwerner.autodocstring",
-                "cschlosser.doxdocgen"
+                "jakobhoeg.vscode-pokemon",
+                "cschlosser.doxdocgen",
             ]
         }
     }
