@@ -26,6 +26,7 @@ COPY --exclude=build --exclude=install . ${ROS_WS}
 # Derive build/exec dependencies into a /tmp/[build|exec]_dependencies.txt
 # Taken from an official ROS image
 RUN bash -e <<'EOF'
+set -uo pipefail
 declare -A types=(
   [exec]="--dependency-types=build --dependency-types=exec --dependency-types=test --dependency-types=doc"
   [build]="--dependency-types=build --dependency-types=test")
