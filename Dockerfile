@@ -113,7 +113,7 @@ RUN echo "${ROS_USER} ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/apt-get, /usr/b
 COPY --chown=orthopus --exclude=**/build --exclude=**/install --exclude=**/log . ${ROS_WS}
 RUN chmod -R a+rwX ${ROS_WS}
 
+USER ${ROS_USER}
+
 RUN . /opt/ros/$ROS_DISTRO/setup.sh && . /home/${ROS_USER}/.bashrc && cd ${ROS_WS} && \
     colcon build --symlink-install --continue-on-error --mixin release
-
-USER ${ROS_USER}
