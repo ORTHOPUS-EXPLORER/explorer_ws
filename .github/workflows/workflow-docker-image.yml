@@ -38,7 +38,7 @@ jobs:
               uses: docker/metadata-action@v6
               with:
                 flavor: latest=false
-                images: ghcr.io/orthopus-explorer/ros-${{ inputs.ros_distro }}-explorer-ws/${{ inputs.image_name }}
+                images: ghcr.io/orthopus-explorer/explorer-ws/${{ inputs.image_name }}:${{ inputs.ros_distro }}-latest
                 tags: |
                   # Tag as latest on tag on default branch
                   type=raw,value=latest,enable={{is_default_branch}}

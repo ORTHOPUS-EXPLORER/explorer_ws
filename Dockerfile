@@ -21,11 +21,12 @@ APT::Install-Suggests "false";
 EOF
 
 WORKDIR ${ROS_WS}
-COPY --exclude=build --exclude=install . ${ROS_WS}
+COPY --exclude=**/build --exclude=**/install . ${ROS_WS}
 
 # Derive build/exec dependencies into a /tmp/[build|exec]_dependencies.txt
 # Taken from an official ROS image
 RUN bash -e <<'EOF'
+set -uo pipefail
 declare -A types=(
   [exec]="--dependency-types=build --dependency-types=exec --dependency-types=test --dependency-types=doc"
   [build]="--dependency-types=build --dependency-types=test")
@@ -66,7 +67,7 @@ RUN make install -C /tmp && rm /tmp/Makefile
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash && source install/setup.bash || true' >> ~/.bashrc
 
 ##  ---------------- Runner part (dev)---------------- 
-FROM ghcr.io/orthopus-explorer/ros-${ROS_DISTRO}-explorer/dev AS explorer_ws_dev
+FROM ghcr.io/orthopus-explorer/explorer_stack/dev:${ROS_DISTRO}-latest AS explorer_ws_dev
 LABEL org.opencontainers.image.source="https://github.com/ORTHOPUS-EXPLORER/explorer_ws"
 LABEL org.opencontainers.image.description="Development image for Orthopus Explorer workspace"
 # LABEL org.opencontainers.image.licenses=
@@ -109,10 +110,10 @@ WORKDIR ${ROS_WS}
 # Setup passwordless sudoers for apt related commands
 RUN echo "${ROS_USER} ALL=(ALL) NOPASSWD: /usr/bin/apt, /usr/bin/apt-get, /usr/bin/aptitude, /usr/bin/apt-fast, /usr/bin/add-apt-repository, /usr/local/bin/set_device_permissions.sh" >> /etc/sudoers
 
-COPY --chown=orthopus --exclude=build --exclude=install --exclude=log . ${ROS_WS}
+COPY --chown=orthopus --exclude=**/build --exclude=**/install --exclude=**/log . ${ROS_WS}
 RUN chmod -R a+rwX ${ROS_WS}
+
+USER ${ROS_USER}
 
 RUN . /opt/ros/$ROS_DISTRO/setup.sh && . /home/${ROS_USER}/.bashrc && cd ${ROS_WS} && \
     colcon build --symlink-install --continue-on-error --mixin release
-
-USER ${ROS_USER}

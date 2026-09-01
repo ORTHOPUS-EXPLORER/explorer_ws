@@ -30,6 +30,7 @@ from explorer_bringup.launch.optional import (
 )
 from explorer_bringup.launch.optional_parameters import (
     declare_parameter_input_device,
+    declare_parameter_joy_backend,
     declare_parameter_spacenav,
 )
 from explorer_bringup.launch.shared import (
@@ -72,6 +73,7 @@ def _declare_arguments(robot_controller_config: CONTROLLER_CONFIG_TYPE):
         ),
         declare_parameter_spacenav(),
         declare_parameter_input_device(),
+        declare_parameter_joy_backend(),
     ]
 
 
