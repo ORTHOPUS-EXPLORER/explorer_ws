@@ -21,10 +21,16 @@
         "--security-opt=seccomp=unconfined",
         "--ulimit", "rtprio=99",
         "--ulimit", "memlock=-1",
-        "--device", "/dev/dri:/dev/dri",
-        "--device", "/dev/input:/dev/input",
-        // Whitelist input device regarding joysticks (13: taken from https://www.kernel.org/doc/Documentation/admin-guide/devices.txt)
-        "--device-cgroup-rule=c 13:* rmw"
+        // Whiteliste all characters devices (tried to whitelist only what's needed but issue regarding /dev/media* devices)
+        "--device-cgroup-rule=c *:* rw",
+        
+        // Whitelist devices : joystick (13: taken from https://www.kernel.org/doc/Documentation/admin-guide/devices.txt)
+        // "--device-cgroup-rule=c 13:* rw",
+        // Whitelist devices : video4linux camera
+        // "--device-cgroup-rule=c 81:* rw",
+        // Whitelist devices :  GPU
+        // "--device-cgroup-rule=c 226:* rw"
+
         // "--pid=host", // DDS discovery with host, without --network=host
         // "--gpus=all" // access to all GPUs, e.g. for GPU-accelerated applications
     ],
@@ -46,6 +52,11 @@
             "type": "bind"
         },
         {
+            "source": "/dev",
+            "target": "/dev",
+            "type": "bind"
+        },
+        {
             "source": "${localEnv:SSH_AUTH_SOCK}",
             "target": "/ssh-agent",
             "type": "bind"
@@ -53,16 +64,6 @@
         {
             "source": "${localWorkspaceFolder}/.devcontainer/.xauthority",
             "target": "/root/.Xauthority",
-            "type": "bind"
-        },
-        {
-            "source": "/dev/input",
-            "target": "/dev/input",
-            "type": "bind"
-        },
-        {
-            "source": "/dev/dri",
-            "target": "/dev/dri",
             "type": "bind"
         }
     ],
