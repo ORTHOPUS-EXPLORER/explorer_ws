@@ -31,13 +31,15 @@
         // Whitelist devices :  GPU
         // "--device-cgroup-rule=c 226:* rw"
 
-        // "--pid=host", // DDS discovery with host, without --network=host
+        "--pid=host", // DDS discovery with host, without --network=host
+        // Per-machine ROS_DOMAIN_ID, written by initializeCommand.
+        "--env-file=${localWorkspaceFolder}/.devcontainer/.env"
         // "--gpus=all" // access to all GPUs, e.g. for GPU-accelerated applications
     ],
     "workspaceFolder": "/root/explorer_ws",
     "workspaceMount": "source=${localWorkspaceFolder},target=${containerWorkspaceFolder},type=bind",
     // Try to pull all private repositories
-    "initializeCommand": "if [ -n \"${localEnv:XAUTHORITY}\" ] && [ -f \"${localEnv:XAUTHORITY}\" ]; then cp \"${localEnv:XAUTHORITY}\" ${localWorkspaceFolder}/.devcontainer/.xauthority; elif [ -f \"$HOME/.Xauthority\" ]; then cp \"$HOME/.Xauthority\" ${localWorkspaceFolder}/.devcontainer/.xauthority; else touch ${localWorkspaceFolder}/.devcontainer/.xauthority; fi && chmod 600 ${localWorkspaceFolder}/.devcontainer/.xauthority && make init",
+    "initializeCommand": "if [ -n \"${localEnv:XAUTHORITY}\" ] && [ -f \"${localEnv:XAUTHORITY}\" ]; then cp \"${localEnv:XAUTHORITY}\" ${localWorkspaceFolder}/.devcontainer/.xauthority; elif [ -f \"$HOME/.Xauthority\" ]; then cp \"$HOME/.Xauthority\" ${localWorkspaceFolder}/.devcontainer/.xauthority; else touch ${localWorkspaceFolder}/.devcontainer/.xauthority; fi && chmod 600 ${localWorkspaceFolder}/.devcontainer/.xauthority && bash ${localWorkspaceFolder}/.devcontainer/ros_domain_id.sh && make init",
     "postCreateCommand": "git config --global --add safe.directory '*' && /bin/bash -ci '${containerWorkspaceFolder}/explorer_stack/.devcontainer/build.sh'",
     "postStartCommand": "set_device_permissions.sh",
     "remoteEnv": {
