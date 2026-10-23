@@ -4,3 +4,6 @@
 [submodule "wheelchair_stack"]
 	path = wheelchair_stack
 	url = ../wheelchair_stack.git
+[submodule "qontrol_controller/qontrol_controller"]
+	path = qontrol_controller/qontrol_controller
+	url = ../qontrol_controller.git

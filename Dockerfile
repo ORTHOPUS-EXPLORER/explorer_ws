@@ -60,10 +60,6 @@ RUN --mount=type=cache,target=/etc/apt/apt.conf.d,from=explorer_ws_cacher,source
     # CI build caching + modprobe (kmod) + killall command (psmisc)
     && apt install -y ccache kmod psmisc
 
-## Install manual extra dependencies
-COPY qontrol_controller/Makefile /tmp
-RUN make install -C /tmp && rm /tmp/Makefile
-
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash && source install/setup.bash || true' >> ~/.bashrc
 
 ##  ---------------- Runner part (dev)---------------- 
@@ -85,10 +81,6 @@ RUN --mount=type=cache,target=/etc/apt/apt.conf.d,from=explorer_ws_cacher,source
     sed -i '/.*clang.*/d' /tmp/exec_dependencies.txt \
     && < /tmp/exec_dependencies.txt xargs apt-get install -y --no-install-recommends \
     && apt install -y --no-install-recommends psmisc
-
-## Install manual extra dependencies
-COPY qontrol_controller/Makefile /tmp
-RUN make install -C /tmp && rm /tmp/Makefile
 
 RUN echo 'source /opt/ros/${ROS_DISTRO}/setup.bash && source install/setup.bash || true' >> ~/.bashrc
 
