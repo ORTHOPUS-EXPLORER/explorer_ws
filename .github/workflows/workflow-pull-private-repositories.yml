@@ -6,10 +6,23 @@ jobs:
     pull-private-repositories:
         runs-on: ubuntu-latest
         steps:
+            - name: Generate token for private submodules
+              id: app-token
+              uses: actions/create-github-app-token@v2
+              with:
+                app-id: ${{ secrets.ORTHOPUS_CI_APP_ID }}
+                private-key: ${{ secrets.ORTHOPUS_CI_APP_PRIVATE_KEY }}
+                owner: ${{ github.repository_owner }}
+                repositories: |
+                  explorer_ws
+                  qontrol_controller
+                  qontrol
+
             - name: Checkout PR
               uses: actions/checkout@v7
               with:
                 submodules: recursive
+                token: ${{ steps.app-token.outputs.token }}
 
             - name: Pull private repositories
               run: make init REPOSITORY_USE_SSH=0 INRIA_REPOSITORY_HTTPS_USERNAME=${{ secrets.INRIA_USERNAME }} INRIA_REPOSITORY_HTTPS_TOKEN=${{ secrets.INRIA_TOKEN }}
