@@ -58,6 +58,8 @@ jobs:
                   type=raw,value=latest,enable={{is_default_branch}}
                   # Use version only instead of raw git tag (in case of vX.Y.Z tag)
                   type=semver,pattern={{version}}
+                  # Manual launch on a branch: tag with the branch name
+                  type=ref,event=branch
             
             - name: Log in to the Container registry 
               uses: docker/login-action@v4
