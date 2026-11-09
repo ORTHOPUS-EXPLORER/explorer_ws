@@ -6,7 +6,7 @@ on:
           required: true
           type: string
         ros_distro:
-          default: iron
+          default: jazzy
           required: false
           type: string
         target:
@@ -51,13 +51,18 @@ jobs:
               id: meta
               uses: docker/metadata-action@v6
               with:
-                flavor: latest=false
-                images: ghcr.io/orthopus-explorer/explorer-ws/${{ inputs.image_name }}:${{ inputs.ros_distro }}-latest
+                # Image name only: the ROS distro is added as a tag prefix (e.g. dev:jazzy-latest)
+                images: ghcr.io/orthopus-explorer/explorer-ws/${{ inputs.image_name }}
+                flavor: |
+                  prefix=${{ inputs.ros_distro }}-
+                  latest=false
                 tags: |
-                  # Tag as latest on tag on default branch
+                  # Tag as latest when built from the default branch
                   type=raw,value=latest,enable={{is_default_branch}}
                   # Use version only instead of raw git tag (in case of vX.Y.Z tag)
                   type=semver,pattern={{version}}
+                  # Non-semver git tag (e.g. test tag on a branch): use the raw tag name
+                  type=ref,event=tag,enable=${{ !startsWith(github.ref, 'refs/tags/v') }}
                   # Manual launch on a branch: tag with the branch name
                   type=ref,event=branch
             
@@ -74,7 +79,12 @@ jobs:
             - name: Build and push
               uses: docker/build-push-action@v7
               with:
+                # Build from the local checkout (which already contains the private
+                # submodules) instead of letting BuildKit re-clone the repo with GITHUB_TOKEN
+                context: .
                 push: true
                 tags: ${{ steps.meta.outputs.tags }}
                 labels: ${{ steps.meta.outputs.labels }}
                 target: ${{ inputs.target }}
+                build-args: |
+                  ROS_DISTRO=${{ inputs.ros_distro }}
