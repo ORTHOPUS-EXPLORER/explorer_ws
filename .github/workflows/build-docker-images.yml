@@ -3,6 +3,18 @@ on:
     push:
       tags:
           - '**'
+    # Manual launch from the Actions tab, on any branch or tag
+    workflow_dispatch:
+      inputs:
+        image:
+          description: Images to build and push
+          type: choice
+          default: dev-prod
+          options:
+            - dev-prod
+            - dev
+            - prod
+            - builder
 
 permissions:
   contents: read
@@ -10,8 +22,8 @@ permissions:
 
 jobs:
   build-and-push-CI-docker-image:
-    ## Deploy new CI image only if master changes
-    if: ${{ github.ref == 'master' }}
+    ## Deploy new CI image only if master changes, or on manual request
+    if: ${{ github.ref == 'master' || inputs.image == 'builder' }}
     uses: ./.github/workflows/workflow-docker-image.yml
     with:
       image_name: builder
@@ -19,6 +31,7 @@ jobs:
     secrets: inherit
 
   build-and-push-dev-docker-image:
+    if: ${{ github.event_name == 'push' || inputs.image == 'dev-prod' || inputs.image == 'dev' }}
     uses: ./.github/workflows/workflow-docker-image.yml
     with:
       image_name: dev
@@ -26,6 +39,7 @@ jobs:
     secrets: inherit
 
   pull-private-repositories:
+    if: ${{ github.event_name == 'push' || inputs.image == 'dev-prod' || inputs.image == 'prod' }}
     uses: ./.github/workflows/workflow-pull-private-repositories.yml
     secrets: inherit
 
