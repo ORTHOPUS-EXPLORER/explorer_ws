@@ -107,5 +107,7 @@ RUN chmod -R a+rwX ${ROS_WS}
 
 USER ${ROS_USER}
 
+ENV ROS_AUTOMATIC_DISCOVERY_RANGE=SUBNET
+
 RUN . /opt/ros/$ROS_DISTRO/setup.sh && . /home/${ROS_USER}/.bashrc && cd ${ROS_WS} && \
     colcon build --symlink-install --continue-on-error --mixin release
